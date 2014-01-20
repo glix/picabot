@@ -19,6 +19,7 @@ module Picabot
       repos = get("/repositories?since=#{Storage[:id]}")
       repos.each do |repo|
         begin
+          next if repo[:fork] unless $FORKS
           files = get "/repos/#{repo[:full_name]}/git/trees/master?recursive=1"
           if files[:tree].any? { |f| f[:path] =~ /\.(jpg|png|gif)$/ }
             Storage[:queue] <<= new(name = repo[:full_name])

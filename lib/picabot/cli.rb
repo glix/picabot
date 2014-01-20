@@ -48,7 +48,11 @@ DESC
         end
 
         on '-d', '--daemonize', 'Daemonize the process' do
-          Process.daemonize
+          Process.daemon
+        end
+
+        on '-f', '--forks', "Don't skip forks" do
+          $FORKS = true
         end
 
         option :commit_message, 'text', 'Commit title'

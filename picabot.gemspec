@@ -14,4 +14,9 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
   s.summary = 'GitHub image optimizer'
   s.description = 'Goes into every place on GitHub and optimizes repos.'
+
+  s.add_dependency 'rest-client'
+  s.add_dependency 'image_optim'
+  s.add_dependency 'moneta'
+  s.add_dependency 'git'
 end
