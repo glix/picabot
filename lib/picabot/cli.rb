@@ -47,6 +47,10 @@ DESC
           @workers = number
         end
 
+        on '-d', '--daemonize', 'Daemonize the process' do
+          Process.daemonize
+        end
+
         option :commit_message, 'text', 'Commit title'
         option :branch, 'name', 'Name of the optimized branch'
         option :error_time, 'time', 'How many seconds to wait after an exception'
