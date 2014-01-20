@@ -20,7 +20,7 @@ module Picabot
     end
   rescue
     $stderr.puts "\n", $!, $@, "Going to sleep for #{Storage[:error_time]} secs...\n\n"
-    sleep Storage[:error_time]
+    sleep Storage[:error_time].to_i
     retry
   end
 end

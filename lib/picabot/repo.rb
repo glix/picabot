@@ -48,7 +48,7 @@ module Picabot
     def fork
       payload = Storage[:organization] ? { organization: Storage[:organization] } : {}
       response = post "/repos/#{@repo}/forks", payload
-      sleep Storage[:fork_time]
+      sleep Storage[:fork_time].to_i
       response[:ssh_url]
     end
 
