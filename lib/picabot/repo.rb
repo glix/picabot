@@ -13,7 +13,7 @@ module Picabot
       repos.delete_if do |repo|
         begin
           files = get "/repos/#{repo[:full_name]}/git/trees/master?recursive=1"
-          !files[:tree].any? { |f| f[:path] =~ /\.(jpg|png)$/ }
+          !files[:tree].any? { |f| f[:path] =~ /\.(jpg|png|gif)$/ }
         rescue RestClient::ResourceNotFound
           next
         end
@@ -75,7 +75,7 @@ module Picabot
       def execute(method, *args)
         options = { method: method, url: "#{GITHUB}#{args[0]}", headers: {:Authorization => "token #{Storage[:token]}"} }
         options[:payload] = args[1].to_json if args[1]
-        p options
+        $stderr.puts "#{method.upcase} #{args[0]} #{options[:payload]}"
         JSON.parse(RestClient::Request.execute(options), symbolize_names: true)
       end
 
