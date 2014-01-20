@@ -6,7 +6,7 @@ module Picabot
   Worker = Module.new
   def Worker.new
     loop do
-      @repos = Storage[:queue] || Repo.fetch
+      @repos = Storage[:queue] || Repo.all
       @repos.each do |repo|
         repo.clone '/tmp/%s'
 
@@ -17,9 +17,10 @@ module Picabot
         @repos.shift
       end
     end
-  rescue # => error
-    sleep 360
-    retry
+  # rescue => error
+  #   puts error
+  #   sleep 360
+  #   retry
   ensure
     Storage[:queue] = @repos
   end

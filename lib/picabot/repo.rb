@@ -1,4 +1,5 @@
 require 'rest-client'
+require 'forwardable'
 require 'json'
 require 'git'
 
@@ -9,8 +10,12 @@ module Picabot
     def self.all
       repos = get("/repositories?since=#{Storage[:id]}").map { |r| r[:full_name] }
       repos.each do |repo|
-        files = get "/repos/#{repo}/git/trees/master?recursive=1"
-        repos.delete repo unless files.any? { |f| f[:path] =~ /\.(jpg|png)$/ }
+        begin
+          files = get "/repos/#{repo}/git/trees/master?recursive=1"
+          repos.delete repo unless files[:tree].any? { |f| f[:path] =~ /\.(jpg|png)$/ }
+        rescue RestClient::ResourceNotFound
+          next
+        end
       end
       Storage[:id] = repos.last[:id]
       repos.map { |r| new(r) }
@@ -62,18 +67,23 @@ module Picabot
 
     private
 
-    def execute(method, *args)
-      options = { method: method, url: "#{GITHUB}#{args[0]}", headers: {:Authorization => "token #{Storage[:token]}"} }
-      options[:payload] = args[1] if args[1]
-      JSON.parse(RestClient.execute(options), symbolize_names: true)
-    end
+    extend Forwardable
+    def_delegators :Repo, :get, :post
 
-    def get(path)
-      execute(:get, path)
-    end
+    class << self
+      def execute(method, *args)
+        options = { method: method, url: "#{GITHUB}#{args[0]}", headers: {:Authorization => "token #{Storage[:token]}"} }
+        options[:payload] = args[1] if args[1]
+        JSON.parse(RestClient::Request.execute(options), symbolize_names: true)
+      end
 
-    def post(path, payload)
-      execute(:post, path, payload)
+      def get(path)
+        execute(:get, path)
+      end
+
+      def post(path, payload)
+        execute(:post, path, payload)
+      end
     end
   end
 end
