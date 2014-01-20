@@ -1,0 +1,30 @@
+Picabot
+=======
+
+Install Picabot:
+
+  $ gem install picabot
+
+Then install required optimizer binaries:
+
+  https://github.com/toy/image_optim#binaries-installation
+
+Run Picabot help:
+
+  $ picabot -h
+
+Get your token at https://github.com/settings/tokens/new and use your username:
+
+  $ picabot --user somu --token h03niea942fl509zc8
+
+After this run, you can run it without any flags:
+
+  $ picabot
+
+Use id flag to move your Picabot pointer to newer repos:
+
+  $ picabot --id 12000000
+
+Picabot loves concurrency:
+  
+  $ picabot --workers 3
