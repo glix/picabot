@@ -8,13 +8,13 @@ module Picabot
     loop do
       @repos = Storage[:queue] || Repo.all
       @repos.each do |repo|
-        repo.clone '/tmp/%s'
-
-        # Hero of the day:
-        ImageOptim.new.optimize_images! Dir["#{directory}/**/**.{png,jpg}"]
-
-        repo.proccess
-        @repos.shift
+        begin
+          directory = repo.clone '/tmp/%s'
+          ImageOptim.new.optimize_images! Dir["#{directory}/**/**.{png,jpg}"]
+          repo.proccess
+        ensure
+          @repos.shift
+        end
       end
     end
   # rescue => error

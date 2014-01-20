@@ -1,4 +1,5 @@
 require 'moneta'
+require 'logger'
 
 module Picabot
   Storage = Moneta.new(:YAML, file: "#{Dir.home}/picabot.yaml")
@@ -7,7 +8,10 @@ module Picabot
   Storage[:branch]         ||= 'optimize-via-picabot'
   Storage[:commit_message] ||= 'Optimize images via Picabot'
   Storage[:error_time]     ||= 360
-  Storage[:fork_time]      ||= 300
+  Storage[:fork_time]      ||= 30
+
+  #Storage[:logger]         ||= STDOUT
+  #Storage[:logger_level]   ||= Logger::DEBUG
 
   Storage[:pr_title]       ||= 'Losslessly compress images via Picabot'
   Storage[:pr_text]        ||= "Hello! It is [**Picabot**, an automatic GitHub image optimizer](https://github.com/somu/picabot).\n\n" \
@@ -23,6 +27,4 @@ module Picabot
                                "often. And also I could dedicate all my work time to open-source, and it is my dream, in fact. \n\n" \
                                "[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZXESQ83MM3H78)\n\n" \
                                "Pull requests, forks and favs are welcome: https://github.com/somu/picabot"
-# Storage[:token]
-# Storage[:user]
 end

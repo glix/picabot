@@ -1,4 +1,5 @@
 require 'picabot'
+require 'picabot/version'
 require 'optparse'
 
 module Picabot
