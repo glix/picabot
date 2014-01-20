@@ -9,17 +9,28 @@ module Picabot
     GITHUB  = 'https://api.github.com'
 
     def self.all
+      if @semaphore
+        sleep 1
+        return
+      end
+
+      @semaphore = true
+
       repos = get("/repositories?since=#{Storage[:id]}")
-      repos.delete_if do |repo|
+      repos.each do |repo|
         begin
           files = get "/repos/#{repo[:full_name]}/git/trees/master?recursive=1"
-          !files[:tree].any? { |f| f[:path] =~ /\.(jpg|png|gif)$/ }
-        rescue RestClient::ResourceNotFound
+          if files[:tree].any? { |f| f[:path] =~ /\.(jpg|png|gif)$/ }
+            Storage[:queue] <<= new(name = repo[:full_name])
+            $stderr.puts "FOUND #{name}"
+          end
+          Storage[:id] = repo[:id]
+        rescue
           next
         end
       end
-      Storage[:id] = repos.last[:id]
-      repos.map { |r| new(r[:full_name]) }
+
+      @semaphore = false
     end
 
     def initialize(repo)
@@ -27,7 +38,7 @@ module Picabot
     end
 
     def clone(pattern)
-      directory = pattern % Digest::MD5.hexdigest(@repo)
+      directory = pattern % @repo
       @directory = directory
       @base = Git.clone(fork, directory)
       @base.branch(Storage[:branch]).checkout
@@ -55,8 +66,8 @@ module Picabot
     def pull_request
       location = Storage[:organization] || Storage[:user]
       post "/repos/#{@repo}/pulls", {
-        title: Storage[:pr_title],
-        body:  Storage[:pr_text],
+        title: Storage[:pull_request_title],
+        body:  Storage[:pull_request_body],
         base: 'master',
         head: "#{location}:#{Storage[:branch]}"
       }

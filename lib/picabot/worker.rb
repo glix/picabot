@@ -5,23 +5,22 @@ require 'fileutils'
 module Picabot
   Worker = Module.new
   def Worker.new
+    optimizer = ImageOptim.new nice: 20, optipng: {level: 7}
     loop do
-      @repos = Storage[:queue] || Repo.all
-      @repos.each do |repo|
-        begin
-          directory = repo.clone '/tmp/%s'
-          ImageOptim.new.optimize_images! Dir["#{directory}/**/**.{png,jpg}"]
-          repo.proccess
-        ensure
-          @repos.shift
-        end
-      end
+      Repo.all while Storage[:queue].empty?
+      sleep 0.2 while @semaphore == true
+      @semaphore = true
+        repo = Storage[:queue].shift
+        Storage[:queue] = Storage[:queue].drop(1)
+      @semaphore = false
+
+      directory = repo.clone '/tmp/picabot/%s'
+      optimizer.optimize_images! Dir["#{directory}/**/**.{png,jpg,gif}"]
+      repo.proccess
     end
-  # rescue => error
-  #   puts error
-  #   sleep 360
-  #   retry
-  ensure
-    Storage[:queue] = @repos
+  rescue
+    $stderr.puts "\n", $!, $@, "Going to sleep for #{Storage[:error_time]} secs...\n\n"
+    sleep Storage[:error_time]
+    retry
   end
 end
