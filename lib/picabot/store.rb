@@ -18,7 +18,7 @@ module Picabot
   default error_time: 30
   default fork_time: 20
 
-  default pull_request_title: 'Losslessly compress images via Picabot [ci-skip]'
+  default pull_request_title: "Losslessly compress images via Picabot\n[ci skip]"
   default pull_request_body: <<-BODY
 Hello! It is [**Picabot**, an automatic GitHub image optimizer](https://github.com/somu/picabot).
 
