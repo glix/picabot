@@ -10,7 +10,7 @@ module Picabot
       alias :_new :new
 
       def fill(&block)
-        @filler = proc(&block)
+        @@filler = proc(&block)
       end
 
       def new
