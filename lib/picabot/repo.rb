@@ -28,9 +28,11 @@ module Picabot
     end
 
     def fork
-      payload = Storage[:organization] ? { organization: Storage[:organization] } : {}
+      organization = Store[:organization]
+      payload = organization ? { organization: organization } : {}
       response = post "/repos/#{@repo}/forks", payload
-      sleep Storage[:fork_time].to_i
+      sleep Store[:fork_time].to_i
+      @branch = response[:default_branch]
       response[:ssh_url]
     end
 
@@ -38,7 +40,7 @@ module Picabot
       directory = pattern % @repo
       @directory = directory
       @base = Git.clone(fork, directory)
-      @base.branch(Storage[:branch]).checkout
+      @base.branch(Store[:branch]).checkout
       directory
     end
 
@@ -51,25 +53,25 @@ module Picabot
     end
 
     def commit
-      @base.commit_all Storage[:commit_message]
-      @base.push 'origin', Storage[:branch]
+      @base.commit_all Store[:commit_message]
+      @base.push 'origin', Store[:branch]
     end
 
     def location
-      Storage[:organization] || Storage[:user]
+      Store[:organization] || Store[:user]
     end
 
     def pull_request
       post "/repos/#{@repo}/pulls", {
-        title: Storage[:pull_request_title],
-        body:  Storage[:pull_request_body],
-        base: 'master',
-        head: "#{location}:#{Storage[:branch]}"
+        title: Store[:pull_request_title],
+        body:  Store[:pull_request_body],
+        base: @branch,
+        head: "#{location}:#{Store[:branch]}"
       }
     end
 
     def mark_as_processed
-      Storage[:processed] <<= repo.id
+      Store[:processed] <<= repo.id
     end
 
     def remove
