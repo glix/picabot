@@ -1,3 +1,5 @@
+require 'picabot/api'
 require 'picabot/repo'
+require 'picabot/store'
+require 'picabot/queue'
 require 'picabot/worker'
-require 'picabot/storage'
