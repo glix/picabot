@@ -19,10 +19,12 @@ module Picabot
     end
 
     def include_images?
-      get("/repos/#{@repo}/git/trees/master?recursive=1")[:tree].any? do |f|
-        f[:path] =~ /\.(jpg|png|gif)$/
-      end
+      tree = get("/repos/#{@repo}/git/trees/master?recursive=1")[:tree]
+      check = tree.any? { |f| f[:path] =~ /\.(jpg|png|gif)$/ }
+      mark_as_processed unless check
+      check
     rescue
+      mark_as_processed
       false
     end
 
