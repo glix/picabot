@@ -4,14 +4,14 @@ require 'fileutils'
 
 module Picabot
   class Worker
-    SEMAPHORE = Moneta::Mutex.new(Store, :mutex)
+    MUTEX = Moneta::Mutex.new(Store, :mutex)
 
     def initialize
       @optimizer = ImageOptim.new nice: 50, optipng: {level: 7}
     end
 
     def repo
-      SEMAPHORE.synchronize do
+      MUTEX.synchronize do
         repo, *Store[:queue] = Store[:queue]
         repo
       end
