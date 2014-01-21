@@ -47,7 +47,12 @@ module Picabot
       response = post "/repos/#{@repo}/forks", payload
       @default_branch = response[:default_branch]
       sleep Store[:fork_time].to_i
-      response[:ssh_url]
+      rename_repo response
+    end
+
+    def rename_repo(response)
+      random = rand(36**4).to_s(36).gsub(/\d/, 'a')
+      patch("/repos/#{response[:full_name]}", {name: "#{response[:name]}-#{random}"})[:ssh_url]
     end
 
     def clone(pattern = '/tmp/picabot/%s')

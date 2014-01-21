@@ -16,5 +16,9 @@ module Picabot
     def post(path, payload)
       execute(:post, path, payload)
     end
+
+    def patch(path, payload)
+      execute(:patch, path, payload)
+    end
   end
 end
