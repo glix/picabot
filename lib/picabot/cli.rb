@@ -10,7 +10,7 @@ module Picabot
 
     def self.option(key, type, description)
       on("--#{key.to_s.gsub('_','-')} <#{type}>", description) do |arg|
-        Storage[key] = arg
+        Store[key] = arg
       end
     end
 
@@ -58,12 +58,12 @@ DESC
         option :organization, 'name', 'Organization to save forks into'
 
         on '--no-organization', 'Delete organization info' do
-          Storage[:organization] = nil
+          Store[:organization] = nil
         end
 
         option :pull_request_title, 'text', 'Title of the bot\'s PR'
         on '--pull-request-body <path>', 'Path to the file with PR text' do |path|
-          Storage[:pull_request_body] = File.read(path)
+          Store[:pull_request_body] = File.read(path)
         end
 
         o.separator 'Queue customizers:'

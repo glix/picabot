@@ -29,7 +29,7 @@ module Picabot
     end
 
     def not_processed?
-      !Storage[:processed].include?(@id)
+      !Store[:processed].include?(@id)
     end
 
     def process(&block)

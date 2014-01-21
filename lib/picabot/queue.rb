@@ -4,7 +4,7 @@ module Picabot
 
     class << self
       def empty?
-        Storage[:queue].empty?
+        Store[:queue].empty?
       end
 
       alias :_new :new
@@ -38,8 +38,8 @@ module Picabot
     protected
 
     def all
-      process "/repositories?since=#{Storage[:id]}" do |repo|
-        Storage[:id] = repo.id
+      process "/repositories?since=#{Store[:id]}" do |repo|
+        Store[:id] = repo.id
       end
     end
 
@@ -64,7 +64,7 @@ module Picabot
     end
 
     def save(repo)
-      Storage[:queue] <<= repo
+      Store[:queue] <<= repo
       $stderr.puts "QUEUE #{name}"
     end
 
