@@ -51,12 +51,12 @@ module Picabot
     end
 
     def rename_repo(response)
-      random = rand(36**4).to_s(36).gsub(/\d/, 'a')
-      patch("/repos/#{response[:full_name]}", {name: "#{response[:name]}-#{random}"})[:ssh_url]
+      @random_name = response[:name] + rand(36**4).to_s(36).gsub(/\d/, 'a')
+      patch("/repos/#{response[:full_name]}", {name: @random_name})[:ssh_url]
     end
 
     def clone(pattern = '/tmp/picabot/%s')
-      @base = Git.clone(fork, @directory = pattern % @repo)
+      @base = Git.clone(fork, @directory = pattern % @random_name)
       @base.branch(branch).checkout
       @directory
     end
