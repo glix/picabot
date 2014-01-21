@@ -20,7 +20,7 @@ module Picabot
     end
 
     @@lock = false
-    @@filler = -> { all }
+    @@filler = -> { search 'stars:>100' }
 
     def initialize
       @@lock = true
