@@ -42,12 +42,8 @@ DESC
           @workers = number
         end
 
-        on '-d', '--daemonize', 'Daemonize the process' do
-          Process.daemon
-        end
-
         on '-f', '--forks', "Don't skip forks" do
-          $FORKS = true
+          Queue.allow_forks!
         end
 
         option :commit_message, 'text', 'Commit title'
