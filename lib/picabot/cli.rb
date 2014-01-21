@@ -10,11 +10,6 @@ module Picabot
 
     def self.option(key, type, description)
       on("--#{key.to_s.gsub('_','-')} <#{type}>", description) do |arg|
-        if arg == 'default'
-          Storage[key] = nil
-          puts ":#{key} reset to default. Now exiting."
-          exit
-        end
         Storage[key] = arg
       end
     end
@@ -73,7 +68,8 @@ DESC
 
         o.separator 'Queue customizers:'
         on '-u', '--add-user <name>', 'Add user repos' do |name|
-          Repo.user name
+          Queue.fill { user name }
+          Queue.new
           exit
         end
       end.parse! arguments
