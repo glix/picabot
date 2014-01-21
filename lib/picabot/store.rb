@@ -2,7 +2,7 @@ require 'moneta'
 require 'logger'
 
 module Picabot
-  Store = Moneta.new(:Daybreak, file: "#{Dir.home}/.picabot.yml")
+  Store = Moneta.new(:Daybreak, file: "#{Dir.home}/.picabot.db")
 
   def self.default(hash)
     Store[hash.keys.first] ||= hash.values.first
@@ -35,6 +35,6 @@ And if I had monthly donations, I would dedicate all my work time to open-source
 
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZXESQ83MM3H78)
 
-Pull requests, forks and favs are welcome: https://github.com/somu/picabot
+Pull requests, forks and stars are welcome: https://github.com/somu/picabot
 BODY
 end
