@@ -76,7 +76,7 @@ module Picabot
     end
 
     def mark_as_processed
-      Store[:processed] <<= repo.id
+      Store[:processed] <<= @id
     end
 
     def remove

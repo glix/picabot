@@ -3,4 +3,4 @@
 $:.unshift File.dirname(__FILE__) << '/../lib'
 
 require 'picabot/cli'
-Picabot::CLI.new
+Picabot::CLI.new.run

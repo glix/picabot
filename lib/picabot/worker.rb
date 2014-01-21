@@ -11,6 +11,10 @@ module Picabot
       @handler = Thread.current.to_s.gsub(/[<>#Thread:]/, '')
       @running = false
     end
+
+    def running?
+      @running
+    end
     
     def run
       raise 'Already running!' if @running
@@ -33,7 +37,7 @@ module Picabot
       puts "WORKER #{@handler}"
       until @stopped || @@stopped ||= false
         Queue.new while Queue.empty?
-        repo.proccess do |directory|
+        repo.process do |directory|
           @optimizer.optimize_images! Dir["#{directory}/**/**.{png,jpg,gif}"]
         end
       end
@@ -43,7 +47,7 @@ module Picabot
     rescue
       time = Store[:error_time]
       $stderr.puts "\n", $!, $@, "SLEEP #{time}\n\n"
-      sleep time.to_i
+      time.to_i.times { sleep 1 unless @stopped }
       retry
     end
     

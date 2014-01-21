@@ -11,7 +11,7 @@ module Picabot
   default queue: []
   default processed: []
 
-  # See description of values in cli.rb
+  # See description of values in cli/*.rb
   default id: '0'
   default branch: 'optimize-via-picabot'
   default commit_message: 'Optimize images via Picabot'

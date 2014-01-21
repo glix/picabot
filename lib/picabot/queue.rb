@@ -20,14 +20,15 @@ module Picabot
     end
 
     @@lock = false
-    @@filler = -> { search 'stars:>100' }
+    @@filler = proc { search('stars:>100') }
 
     def initialize
       @@lock = true
+      @page = 1
     end
 
     def fill
-      @@filler[]
+      self.instance_eval(&@@filler)
       unlock
     end
 
@@ -48,24 +49,24 @@ module Picabot
     end
 
     def search(keyword)
-      process "/search/repositories?q=#{keyword.gsub(' ','+')}&per_page=100&page=#{@page}"
+      process "/search/repositories?q=#{URI.encode keyword}&per_page=100&page=#{@page}"
       @page += 1
     end
 
     private
 
     def process(endpoint)
-      get(endpoint).each do |object|
+      get(endpoint)[:items].each do |object|
         repo = Repo.new(object)
-        next if repo.fork? unless @@forks
-        save repo if repo.include_images? && repo.not_processed?
+        next if repo.fork? unless @@forks ||= false
+        save repo if repo.not_processed? && repo.include_images?
         yield repo if block_given?
       end
     end
 
     def save(repo)
       Store[:queue] <<= repo
-      $stderr.puts "QUEUE #{name}"
+      $stderr.puts "QUEUE #{repo}"
     end
 
     def unlock
