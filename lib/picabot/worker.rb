@@ -5,37 +5,30 @@ require 'fileutils'
 module Picabot
   class Worker
     MUTEX = Moneta::Mutex.new(Store, :mutex)
-
+    
     def initialize
       @optimizer = ImageOptim.new nice: 50, optipng: {level: 7}
       @handler = Thread.current.to_s.gsub(/[<>#Thread:]/, '')
       @running = false
     end
-
-    def repo
-      MUTEX.synchronize do
-        repo, *Store[:queue] = Store[:queue]
-        repo
-      end
-    end
-
+    
     def run
       raise 'Already running!' if @running
       @running = true
       work
     end
-
+    
     def stop
       raise 'Already stopped!' unless @running
       @stopped = true
     end
-
+    
     def self.stop!
       @@stopped = true
     end
-
+    
     private
-
+    
     def work
       puts "WORKER #{@handler}"
       until @stopped || @@stopped ||= false
@@ -52,6 +45,13 @@ module Picabot
       $stderr.puts "\n", $!, $@, "SLEEP #{time}\n\n"
       sleep time.to_i
       retry
+    end
+    
+    def repo
+      MUTEX.synchronize do
+        repo, *Store[:queue] = Store[:queue]
+        repo
+      end
     end
   end
 end
