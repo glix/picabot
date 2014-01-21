@@ -15,7 +15,7 @@ module Picabot
     end
 
     def self.spawn
-      Picabot::Worker.new.run!
+      Picabot::Worker.new.run
     end
 
     def self.new(arguments = ARGV)
