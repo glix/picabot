@@ -51,6 +51,7 @@ module Picabot
     def clone(pattern = '/tmp/picabot/%s')
       @base = Git.clone(fork, @directory = pattern % @repo)
       @base.branch(branch).checkout
+      @directory
     end
 
     def commit
