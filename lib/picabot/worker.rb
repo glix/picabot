@@ -3,24 +3,32 @@ require 'digest/md5'
 require 'fileutils'
 
 module Picabot
-  Worker = Module.new
-  def Worker.new
-    optimizer = ImageOptim.new nice: 20, optipng: {level: 7}
-    loop do
-      Repo.all while Storage[:queue].empty?
-      sleep 0.2 while @semaphore == true
-      @semaphore = true
-        repo = Storage[:queue].shift
-        Storage[:queue] = Storage[:queue].drop(1)
-      @semaphore = false
+  class Worker
+    SEMAPHORE = Moneta::Mutex.new(Store, :mutex)
 
-      directory = repo.clone '/tmp/picabot/%s'
-      optimizer.optimize_images! Dir["#{directory}/**/**.{png,jpg,gif}"]
-      repo.proccess
+    def initialize
+      @optimizer = ImageOptim.new nice: 50, optipng: {level: 7}
     end
-  rescue
-    $stderr.puts "\n", $!, $@, "Going to sleep for #{Storage[:error_time]} secs...\n\n"
-    sleep Storage[:error_time].to_i
-    retry
+
+    def repo
+      SEMAPHORE.synchronize do
+        repo, *Store[:queue] = Store[:queue]
+        repo
+      end
+    end
+
+    def run!
+      loop {
+        Queue.new while Queue.empty?
+        repo.proccess do |directory|
+          @optimizer.optimize_images! Dir["#{directory}/**/**.{png,jpg,gif}"]
+        end
+      }
+    rescue
+      time = Store[:error_time]
+      $stderr.puts "\n", $!, $@, "SLEEP #{time}\n\n"
+      sleep time.to_i
+      retry
+    end
   end
 end
