@@ -1,6 +1,4 @@
 require 'rest-client'
-require 'forwardable'
-require 'logger'
 require 'json'
 require 'git'
 
