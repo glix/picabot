@@ -70,6 +70,12 @@ DESC
         on '--pull-request-body <path>', 'Path to the file with PR text' do |path|
           Storage[:pull_request_body] = File.read(path)
         end
+
+        o.separator 'Queue customizers:'
+        on '-u', '--add-user <name>', 'Add user repos' do |name|
+          Repo.user name
+          exit
+        end
       end.parse! arguments
 
       if @workers

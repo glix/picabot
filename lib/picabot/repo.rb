@@ -8,30 +8,21 @@ module Picabot
   class Repo
     GITHUB  = 'https://api.github.com'
 
-    def self.all
-      if @semaphore
-        sleep 1
-        return
-      end
-
-      @semaphore = true
-
-      repos = get("/repositories?since=#{Storage[:id]}")
-      repos.each do |repo|
-        begin
-          next if repo[:fork] unless $FORKS
-          files = get "/repos/#{repo[:full_name]}/git/trees/master?recursive=1"
-          if files[:tree].any? { |f| f[:path] =~ /\.(jpg|png|gif)$/ }
-            Storage[:queue] <<= new(name = repo[:full_name])
-            $stderr.puts "FOUND #{name}"
-          end
-          Storage[:id] = repo[:id]
-        rescue
-          next
+    class << self
+      def all
+        if @semaphore
+          sleep 1
+          return
         end
+
+        @semaphore = true
+        put_to_queue "/repositories?since=#{Storage[:id]}", true
+        @semaphore = false
       end
 
-      @semaphore = false
+      def user(name)
+        put_to_queue "/users/#{name}/repos"
+      end
     end
 
     def initialize(repo)
@@ -84,6 +75,22 @@ module Picabot
     def_delegators self, :get, :post
 
     class << self
+      def put_to_queue(endpoint, save_id = false)
+        get(endpoint).each do |repo|
+          begin
+            next if repo[:fork] unless $FORKS
+            files = get "/repos/#{repo[:full_name]}/git/trees/master?recursive=1"
+            if files[:tree].any? { |f| f[:path] =~ /\.(jpg|png|gif)$/ }
+              Storage[:queue] <<= new(name = repo[:full_name])
+              $stderr.puts "FOUND #{name}"
+            end
+            Storage[:id] = repo[:id] if save_id
+          rescue
+            next
+          end
+        end
+      end
+
       def execute(method, *args)
         options = { method: method, url: "#{GITHUB}#{args[0]}", headers: {:Authorization => "token #{Storage[:token]}"} }
         options[:payload] = args[1].to_json if args[1]
