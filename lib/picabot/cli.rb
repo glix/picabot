@@ -15,7 +15,7 @@ module Picabot
     end
 
     def self.spawn
-      Picabot::Worker.new
+      Picabot::Worker.new.run!
     end
 
     def self.new(arguments = ARGV)
@@ -77,9 +77,8 @@ DESC
       if @workers
         @workers.to_i.times do 
           Thread.new { spawn }
-          sleep 0.1
         end
-        loop { sleep 1 }
+        loop { sleep 30 }
       else
         spawn
       end
