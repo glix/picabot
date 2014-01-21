@@ -26,6 +26,10 @@ module Picabot
       false
     end
 
+    def not_processed?
+      !Storage[:processed].include?(@id)
+    end
+
     def process(&block)
       yield clone
       commit

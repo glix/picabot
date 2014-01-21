@@ -58,7 +58,7 @@ module Picabot
       get(endpoint).each do |object|
         repo = Repo.new(object)
         next if repo.fork? unless @@forks
-        save repo if repo.include_images?
+        save repo if repo.include_images? && repo.not_processed?
         yield repo if block_given?
       end
     end
