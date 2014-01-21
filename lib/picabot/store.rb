@@ -2,13 +2,14 @@ require 'moneta'
 require 'logger'
 
 module Picabot
-  Storage = Moneta.new(:YAML, file: "#{Dir.home}/.picabot.yml")
-  
+  Store = Moneta.new(:Daybreak, file: "#{Dir.home}/.picabot.yml")
+
   def self.default(hash)
-    Storage[hash.keys.first] ||= hash.values.first
+    Store[hash.keys.first] ||= hash.values.first
   end
 
   default queue: []
+  default processed: []
 
   # See description of values in cli.rb
   default id: '0'
