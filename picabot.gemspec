@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'rest-client'
   s.add_dependency 'image_optim'
+  s.add_dependency 'daybreak'
   s.add_dependency 'moneta'
   s.add_dependency 'git'
 end
